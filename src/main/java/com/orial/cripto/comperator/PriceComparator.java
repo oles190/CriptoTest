@@ -1,4 +1,4 @@
-package com.orial.cripto.comperable;
+package com.orial.cripto.comperator;
 
 import com.orial.cripto.model.Price;
 import org.springframework.stereotype.Component;
@@ -10,6 +10,6 @@ public class PriceComparator implements Comparator<Price> {
 
     @Override
     public int compare(Price o1, Price o2) {
-        return (int) (o2.getLPrice() - o1.getLPrice());
+        return (o2.getLPrice().compareTo(o1.getLPrice()));
     }
 }

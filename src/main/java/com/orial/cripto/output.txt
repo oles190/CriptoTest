@@ -1,12 +1,12 @@
 Name is BTC
-The highest price is 36759.2
+The highest price is 37897.9
 The lowest price is 36586.3;
 
 Name is ETH
-The highest price is 2625.48
+The highest price is 2838.46
 The lowest price is 2602.13;
 
 Name is XRP
-The highest price is 0.59802
+The highest price is 0.61609
 The lowest price is 0.59629;
 
