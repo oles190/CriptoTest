@@ -57,7 +57,7 @@ public class PriceServiceImpl implements PriceService, Serializable {
         Price min = this.minPriceByCryptocurrency(cryptocurrency);
         Price max = maxPriceByCryptocurrency(cryptocurrency);
         String name = String.format("\nName is %s\n", cryptocurrency);
-        String highest = String.format("The highest price is %s\n;", max.getLowerPrice());
+        String highest = String.format("The highest price is %s;\n", max.getLowerPrice());
         String lower = String.format("The lowest price is %s;\n\n", min.getLowerPrice());
         return Arrays.asList(name, highest, lower);
     }
