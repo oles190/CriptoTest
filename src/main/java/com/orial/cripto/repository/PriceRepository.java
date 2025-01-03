@@ -1,16 +1,14 @@
 package com.orial.cripto.repository;
 
-import com.orial.cripto.model.Price;
+import com.orial.cripto.entity.Price;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface PriceRepository extends JpaRepository<Price,Long> {
+@Repository
+public interface PriceRepository extends JpaRepository<Price, Long> {
 
-    List<Price> findAllByCurr1(String curr1);
-
-    List<Price> findFirst10By();
-
-
+    List<Price> findAllByCryptocurrency(String cryptocurrency);
 
 }

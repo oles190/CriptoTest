@@ -6,10 +6,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
 @SpringBootApplication
-public class OrialApplication {
+public class CriptoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(OrialApplication.class, args);
+        SpringApplication.run(CriptoApplication.class, args);
     }
 
 }

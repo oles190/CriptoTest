@@ -1,17 +1,18 @@
 package com.orial.cripto.service;
 
-import com.orial.cripto.model.Price;
+import com.orial.cripto.entity.Price;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface PriceService {
 
-    List<Price> findAllByCurr1(String curr1);
+    List<Price> findAllByCryptocurrency(String cryptocurrency);
 
-    Price minPriceByCurr1(String curr1);
+    Price minPriceByCryptocurrency(String cryptocurrency);
 
-    Price maxPriceBuCurr1(String curr1);
+    Price maxPriceByCryptocurrency(String cryptocurrency);
 
-    void writeCsv();
+    void writeCsv() throws IOException;
 
 }

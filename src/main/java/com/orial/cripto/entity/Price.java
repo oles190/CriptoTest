@@ -1,6 +1,7 @@
-package com.orial.cripto.model;
+package com.orial.cripto.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,19 +15,19 @@ import javax.persistence.Id;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Price implements Comparable<Price> {
+public class Price {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private Long createdAt;
-    private Double lPrice;
-    private String curr1;
-    private String curr2;
 
+    @JsonProperty("lprice")
+    private Double lowerPrice;
 
-    @Override
-    public int compareTo(Price o) {
-        return this.lPrice.compareTo(o.getLPrice());
-    }
+    @JsonProperty("curr1")
+    private String cryptocurrency;
 
+    @JsonProperty("curr2")
+    private String currency;
 }

@@ -1,45 +1,38 @@
 package com.orial.cripto.rest;
 
 
-import com.orial.cripto.model.Price;
+import com.orial.cripto.entity.Price;
 import com.orial.cripto.service.PriceService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class PriceRestController {
 
     private final PriceService priceService;
 
-    @Autowired
-    public PriceRestController(PriceService priceService) {
-        this.priceService = priceService;
+    @GetMapping("/all/{cryptocurrency}")
+    public List<Price> getAllByCryptocurrency(@PathVariable String cryptocurrency) {
+        return priceService.findAllByCryptocurrency(cryptocurrency);
     }
 
 
-    @GetMapping("/all/{curr1}")
-    public List<Price> getAllByCurr1(@PathVariable String curr1) {
-        return priceService.findAllByCurr1(curr1);
+    @GetMapping("/cryptocurrencies/min/price")
+    public Price minCryptocurrency(@RequestParam String cryptocurrency) {
+        return priceService.minPriceByCryptocurrency(cryptocurrency);
     }
 
-
-    @GetMapping("/cryptocurrencies/minprice")
-    public Price min(@RequestParam String curr1) {
-        return priceService.minPriceByCurr1(curr1);
-    }
-
-    @GetMapping("/cryptocurrencies/maxprice")
-    public Price max(@RequestParam String curr1) {
-        return priceService.maxPriceBuCurr1(curr1);
+    @GetMapping("/cryptocurrencies/max/price")
+    public Price maxCryptocurrency(@RequestParam String cryptocurrency) {
+        return priceService.maxPriceByCryptocurrency(cryptocurrency);
     }
 
     @GetMapping("/csv")
-    public void testOut() {
+    public void prepareCsv() throws IOException {
         priceService.writeCsv();
     }
 

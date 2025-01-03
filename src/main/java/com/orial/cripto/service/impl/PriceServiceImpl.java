@@ -1,86 +1,82 @@
 package com.orial.cripto.service.impl;
 
-import com.orial.cripto.comperator.PriceComparator;
-import com.orial.cripto.model.Price;
+import com.orial.cripto.entity.Price;
 import com.orial.cripto.repository.PriceRepository;
 import com.orial.cripto.service.PriceService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
+import static com.orial.cripto.util.CriptoUtils.*;
+import static java.lang.String.format;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 @Service
-public class PriceServiceImpl implements PriceService {
+@RequiredArgsConstructor
+public class PriceServiceImpl implements PriceService, Serializable {
 
-
-    File file = new File("/Users/olesdoskuc/Desktop/orial/src/main/java/com/orial/cripto/output.txt");
-
+    private final File file = new File(FILE_PATH);
     private final PriceRepository priceRepository;
-    private final PriceComparator comparator;
+    private final Comparator<Price> sortingByLowerPrice = Comparator.comparing(Price::getLowerPrice);
 
-    @Autowired
-    public PriceServiceImpl(PriceRepository priceRepository, PriceComparator comparator) {
-        this.priceRepository = priceRepository;
-        this.comparator = comparator;
-    }
+    @Override
+    public List<Price> findAllByCryptocurrency(String cryptocurrency) {
+        List<Price> prices = priceRepository.findAllByCryptocurrency(cryptocurrency);
 
-    public List<Price> findAllByCurr1(String curr1) {
-        List<Price> all = priceRepository.findAllByCurr1(curr1);
-        if (all.isEmpty()) {
-            throw new NullPointerException("Not found " + curr1);
+        if (isEmpty(prices)) {
+            throw new RuntimeException("empty");
         }
-        return all;
+        return prices;
     }
 
-    public Price minPriceByCurr1(String curr1) {
-        List<Price> all = priceRepository.findAllByCurr1(curr1);
-        return all.stream().sorted().findFirst()
-                .orElseThrow(() -> new NullPointerException("NOT FOUND " + curr1));
+    @Override
+    public Price minPriceByCryptocurrency(String cryptocurrency) {
+        return priceRepository.findAllByCryptocurrency(cryptocurrency).stream()
+                .min(sortingByLowerPrice)
+                .orElseThrow(() -> new RuntimeException(format(cryptocurrency, NOT_FOUND)));
     }
 
-    public Price maxPriceBuCurr1(String curr1) {
-        List<Price> all = priceRepository.findAllByCurr1(curr1);
-        all.sort(comparator);
-        return all.stream().findFirst()
-                .orElseThrow(() -> new NullPointerException("NOT FOUND " + curr1));
+    @Override
+    public Price maxPriceByCryptocurrency(String cryptocurrency) {
+        List<Price> prices = priceRepository.findAllByCryptocurrency(cryptocurrency);
+
+        return prices.stream()
+                .max(sortingByLowerPrice)
+                .orElseThrow(() -> new RuntimeException(format(cryptocurrency, NOT_FOUND)));
     }
 
-    public List<String> informationForCsv(String curr) {
-        Price min = minPriceByCurr1(curr);
-        Price max = maxPriceBuCurr1(curr);
-        String name = "Name is " + curr + "\n";
-        String highest = "The highest price is " + max.getLPrice() + "\n";
-        String lower = "The lowest price is " + min.getLPrice() + ";\n\n";
-        return new ArrayList<>(Arrays.asList(name, highest, lower));
+
+    private List<String> informationForCsv(String cryptocurrency) {
+        Price min = this.minPriceByCryptocurrency(cryptocurrency);
+        Price max = maxPriceByCryptocurrency(cryptocurrency);
+        String name = String.format("\nName is %s\n", cryptocurrency);
+        String highest = String.format("The highest price is %s\n;", max.getLowerPrice());
+        String lower = String.format("The lowest price is %s;\n\n", min.getLowerPrice());
+        return Arrays.asList(name, highest, lower);
     }
 
-    public void writeCsv() {
-        List<String> list1 = informationForCsv("BTC");
-        List<String> list2 = informationForCsv("ETH");
-        List<String> list3 = informationForCsv("XRP");
-        try {
-            file.createNewFile();
+    @Override
+    public void writeCsv() throws IOException {
+        List<String> btcInformation = informationForCsv(BTC);
+        List<String> ethInformation = informationForCsv(ETH);
+        List<String> xrpInformation = informationForCsv(XRP);
+
+        try (OutputStream outputStream = Files.newOutputStream(file.toPath())) {
+            outputStream.write(LocalDateTime.now().toString().getBytes());
+            outputStream.write((btcInformation.get(0) + btcInformation.get(1) + btcInformation.get(2)).getBytes());
+            outputStream.write((ethInformation.get(0) + ethInformation.get(1) + ethInformation.get(2)).getBytes());
+            outputStream.write((xrpInformation.get(0) + xrpInformation.get(1) + xrpInformation.get(2)).getBytes());
 
         } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-
-        try (OutputStream outputStream = new FileOutputStream(file)) {
-            outputStream.write((list1.get(0) + list1.get(1) + list1.get(2)).getBytes());
-            outputStream.write((list2.get(0) + list2.get(1) + list2.get(2)).getBytes());
-            outputStream.write((list3.get(0) + list3.get(1) + list3.get(2)).getBytes());
-
-        } catch (IOException e) {
-            e.getMessage();
+            throw new IOException(e.getMessage());
         }
     }
-
-
 }
 

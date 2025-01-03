@@ -1,0 +1,15 @@
+2025-01-03T08:55:18.931512
+Name is BTC
+The highest price is 68991.2
+;The lowest price is 68991.2;
+
+
+Name is ETH
+The highest price is 3750.0
+;The lowest price is 3750.0;
+
+
+Name is XRP
+The highest price is 0.509
+;The lowest price is 0.509;
+

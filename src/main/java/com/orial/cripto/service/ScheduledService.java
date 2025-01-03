@@ -2,30 +2,27 @@ package com.orial.cripto.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orial.cripto.model.Price;
+import com.orial.cripto.entity.Price;
 import com.orial.cripto.repository.PriceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ScheduledService {
 
     private final PriceRepository priceRepository;
 
-
-    @Autowired
-    public ScheduledService(PriceRepository priceRepository) {
-        this.priceRepository = priceRepository;
-
-    }
-
     @Scheduled(fixedDelay = 10000)
     public void scheduleFixedDelayTask() throws JsonProcessingException {
-        System.out.println("Time " + System.currentTimeMillis());
+        log.info("Start time {}", System.currentTimeMillis());
         RestTemplate restTemplate = new RestTemplate();
 
         String fooResourceUrlBTC = "https://cex.io/api/last_price/BTC/USD";
@@ -36,22 +33,23 @@ public class ScheduledService {
         String responseETH = restTemplate.getForEntity(fooResourceUrlETH, String.class).getBody();
         String responseXRP = restTemplate.getForEntity(fooResourceUrlXRP, String.class).getBody();
 
-        Price price1 = intoObject(responseBTC);
-        Price price2 = intoObject(responseETH);
-        Price price3 = intoObject(responseXRP);
+        Price priceBTC = intoObject(responseBTC);
+        Price priceETH = intoObject(responseETH);
+        Price priceXRP = intoObject(responseXRP);
 
-        price1.setCreatedAt(System.currentTimeMillis());
-        price2.setCreatedAt(System.currentTimeMillis());
-        price3.setCreatedAt(System.currentTimeMillis());
+        long currentTimeMillis = System.currentTimeMillis();
+        priceBTC.setCreatedAt(currentTimeMillis);
+        priceETH.setCreatedAt(currentTimeMillis);
+        priceXRP.setCreatedAt(currentTimeMillis);
 
-        List<Price> lists = new ArrayList<>(Arrays.asList(price1, price2, price3));
-        priceRepository.saveAll(lists);
+        priceRepository.saveAll(Arrays.asList(priceBTC, priceETH, priceXRP));
+
+        log.info("Saved all cryptocurrencies to db. Time {}", System.currentTimeMillis());
     }
 
     public Price intoObject(String response) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
+
         return objectMapper.readValue(response, Price.class);
     }
-
-
 }
